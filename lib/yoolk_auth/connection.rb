@@ -7,7 +7,7 @@ module YoolkAuth
     
     def self.included(base)
       base.before_filter :valid_token, :except => [:handshake]
-      if Rails.env.development? && File.exist?("config/yoolk_auth_connection_mock_config.yaml")
+      if (Rails.env.development? || Rails.env.test?) && File.exist?("config/yoolk_auth_connection_mock_config.yaml")
         require "yoolk_auth/connection_mock"
         base.send(:include, YoolkAuth::ConnectionMock)
         base.prepend_before_filter :handshake #we must call handshake manually in dev
@@ -21,7 +21,7 @@ module YoolkAuth
 
       if params[:username].nil?
         session.store("user", {"logged_in" => false})
-        redirect_to root_url
+        redirect_to root_url(:listing_alias_id => params[:listing_alias_id], :portal_domain_name => params[:portal_domain_name])
       else
         params[:encrypted_key] = Digest::MD5.hexdigest([params[:key], APP_KEY].join("::"))
         res = return_handshake
@@ -30,7 +30,7 @@ module YoolkAuth
         if res.code == "200"
           #set session token
           session["user"] = payload
-          redirect_to root_url
+          redirect_to root_url(:listing_alias_id => params[:listing_alias_id], :portal_domain_name => params[:portal_domain_name])
         else
           redirect_to payload["error_url"]
         end
@@ -48,7 +48,7 @@ module YoolkAuth
 
         if not payload["valid"]
           session.store("user", {"logged_in" => false})
-          redirect_to root_url
+          redirect_to root_url(:listing_alias_id => params[:listing_alias_id], :portal_domain_name => params[:portal_domain_name])
         end
       end
     end
