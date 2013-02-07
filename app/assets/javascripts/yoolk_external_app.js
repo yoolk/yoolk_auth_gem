@@ -20,8 +20,7 @@ var YoolkXDM = function(){
     
     has_postMessage = window[postMessage];
 
-  var target_url = YOOLK_URL,
-    source_origin,
+    var source_origin,
     iframe;
 
   var init = function (source) {
@@ -29,10 +28,11 @@ var YoolkXDM = function(){
   };
 
   var postMessage = function( message ) {
-    if ( has_postMessage && target_url ) {
-      parent.postMessage( message, target_url.replace( /([^:]+:\/\/[^\/]+).*/, '$1' ) ); 
-    } else if ( target_url ) {
-      target.location = target_url.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
+    // target_url = YOOLK_URL;
+    if ( has_postMessage && YOOLK_URL ) {
+      parent.postMessage( message, YOOLK_URL.replace( /([^:]+:\/\/[^\/]+).*/, '$1' ) ); 
+    } else if ( YOOLK_URL ) {
+      target.location = YOOLK_URL.replace( /#.*$/, '' ) + '#' + (+new Date) + (cache_bust++) + '&' + message;
     }
   };
 
@@ -40,7 +40,7 @@ var YoolkXDM = function(){
     iframe = document.createElement("iframe");
     iframe.setAttribute("name", "yoolk_iframe_canvas");
     iframe.id = "yoolk_iframe_canvas";
-    iframe.src = target_url.replace( /([^:]+:\/\/[^\/]+).*/, '$1' );
+    iframe.src = YOOLK_URL.replace( /([^:]+:\/\/[^\/]+).*/, '$1' );
     document.body.appendChild(iframe);
 
     return iframe;
@@ -102,54 +102,16 @@ var YoolkXDM = function(){
 var Yoolk = typeof Yoolk === "object" ? Yoolk : {};
 
 Yoolk = {
-  _getWindowsHeight: function () {
-    var self = this;
-    var x, y, b = document.body, wi = window.innerHeight, ws = window.scrollMaxY;
-
-    if (wi && ws) {
-        y = wi + ws;
-    } else if (b.scrollHeight > b.offsetHeight) {
-        y = b.scrollHeight;
-    } else {
-        y = b.offsetHeight;
-    }
-
-    var w, h, d = document.documentElement;
-    if (self.innerHeight) {
-        h = self.innerHeight;
-    } else if (d && d.clientHeight) {
-        h = d.clientHeight;
-    } else if (b) {
-        h = b.clientHeight;
-    }
-
-    var pH = (y < h) ? h : y;
-
-    return pH;
-  },
-
-  _iHeight: function () {
-    var w, h, d = document.documentElement;
-      if (self.innerHeight) {
-          h = self.innerHeight;
-      } else if (d && d.clientHeight) {
-          h = d.clientHeight;
-      } else if (b) {
-          h = b.clientHeight;
-      }
-
-      return h;
-  },
 
   autoResize: function () {
-    var height = Yoolk._getWindowsHeight(),
+    var height = Yoolk.Util.fullHeight(document.body),
       newHeight = 0,
       self = this;
 
     YoolkXDM.postMessage("{\"height\": " + height + "}");
 
     window.setInterval(function() {
-      newHeight = Yoolk._getWindowsHeight();
+      newHeight = Yoolk.Util.fullHeight(document.body);
 
       if (height !== newHeight) {
         height = newHeight;
@@ -157,6 +119,64 @@ Yoolk = {
         YoolkXDM.postMessage("{\"height\": " + height + "}");
       }
     }, 1000);
+  }
+};
+
+
+Yoolk.Util = {
+  fullHeight: function( elem ) {
+
+    if ( this.getStyle( elem, 'display' ) != 'none' ){
+      return elem.offsetHeight || this.getHeight( elem );
+    }
+
+    var old = this.resetCSS( elem, {
+      display: '',
+      visibility: 'hidden',
+      position: 'absolute'
+    });
+
+    var h = elem.clientHeight || this.getHeight( elem );
+    this.restoreCSS( elem, old );
+
+    return h;
+  },
+
+
+  getStyle: function ( elem, name ) {
+    if (elem.style[name]) {
+      return elem.style[name];    
+    } else if (elem.currentStyle) {
+      return elem.currentStyle[name];
+    } else if (document.defaultView && document.defaultView.getComputedStyle) {
+      name = name.replace(/([A-Z])/g,"-$1");
+      name = name.toLowerCase();
+      var s = document.defaultView.getComputedStyle(elem,"");
+      return s && s.getPropertyValue(name);
+    } else {
+      return null;
+    }
+  },
+
+  getHeight: function ( elem ) {
+    return parseInt( this.getStyle( elem, 'height' ) );
+  },
+
+  resetCSS: function ( elem, prop ) {
+    var old = {};
+
+    for ( var i in prop ) {
+      old[ i ] = elem.style[ i ];
+      elem.style[ i ] = prop[i];
+    }
+
+    return old;
+  },
+  
+  restoreCSS: function ( elem, prop ) {
+    for ( var i in prop ){
+      elem.style[ i ] = prop[ i ];
+    }
   }
 };
 
