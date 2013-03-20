@@ -4,15 +4,9 @@ This gem assists with correctly loading and authenticating an application as an 
 
 ## Installation
 
-Clone the yoolk_auth_gem project to /var/www/yoolk_auth_gem
-
-    cd /var/www/
-    hg clone ssh://hg@bitbucket.org/mylabs/yoolk_auth_gem
-    hg update -r 0.1.3
-
 Add this line to your application's Gemfile
 
-    gem 'yoolk_auth', '0.1.3' :path => '/var/www/yoolk_auth_gem'
+    gem 'yoolk_auth', '0.1.4', :git => 'git://github.com/yoolk/yoolk_auth_gem.git'
 
 And then execute:
 
