@@ -22,7 +22,7 @@ Developers can run all tests using the following command:
 ## Application Setup
 
 Add this include statement to your ApplicationController like this:
-    
+
   __include YoolkAuth::Connection__
 
 Add this to your ApplicationHelper
@@ -48,12 +48,21 @@ For example, save the following yaml config to: "#{Rails.root}/config/yoolk_auth
 
 __remember to restart your app when you first add or remove this file__ You dont need to restart your app if you make changes to the config, however.
 
-Here is a sample set of configurations:
+Here is a sample set of configurations for Sales:
 
     username: "victory@yoolk.com" #note: set to nil to logout (in YAML nil is ~)
     listing_alias_id: "kh34363"
     portal_domain_name: "cambodiastaging.yoolk.com"
-    roles: ["sales"]
+    roles: [{name: "Sales"}]
+    handshake_response_code: "200"
+    error_url: "http://yellowpages-cambodia.dev/app/1/error" #error url for core
+
+Here is a sample set of configurations for Business Account:
+
+    username: "victory@yoolk.com" #note: set to nil to logout (in YAML nil is ~)
+    listing_alias_id: "kh34363"
+    portal_domain_name: "cambodiastaging.yoolk.com"
+    roles: [ {name: "Business Account", resource_type: "Listing", resource_id: "292D51B2-76C8-465D-BEF1-13300DEC90FA"}]
     handshake_response_code: "200"
     error_url: "http://yellowpages-cambodia.dev/app/1/error" #error url for core
 

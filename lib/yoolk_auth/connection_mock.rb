@@ -10,7 +10,7 @@ module YoolkAuth
             params[:portal_domain_name] = yoolk_auth_portal_domain_name
             params[:username] = yoolk_auth_username
             params[:key] = "1234567890"
-            params[:return_handshake_url] = "#" 
+            params[:return_handshake_url] = "#"
 
             update_session_config
 
@@ -18,16 +18,22 @@ module YoolkAuth
           end
         end
 
+        # def return_handshake
+        #   HTTPResponseMock.new(yoolk_auth_config.to_json, yoolk_auth_handshake_response_code)
+        # end
         def return_handshake
-          HTTPResponseMock.new(
-          "{\"username\": \"#{yoolk_auth_username}\", 
-                    \"roles\": #{yoolk_auth_roles}, 
-                    \"logged_in\": #{yoolk_auth_logged_in?}, 
-                    \"token\": \"1234567890\",
-                    \"valid_token_url\": \"#\",
-                    \"error_url\": \"#{yoolk_auth_error_url}\"
-                  }", yoolk_auth_handshake_response_code)
+          YoolkAuth::ConnectionMock::HTTPResponseMock.new(yoolk_auth_config.merge(logged_in: yoolk_auth_logged_in?).to_json, yoolk_auth_handshake_response_code)
         end
+        # def return_handshake
+        #   HTTPResponseMock.new(
+        #   "{\"username\": \"#{yoolk_auth_username}\",
+        #             \"roles\": #{yoolk_auth_roles},
+        #             \"logged_in\": #{yoolk_auth_logged_in?},
+        #             \"token\": \"1234567890\",
+        #             \"valid_token_url\": \"#\",
+        #             \"error_url\": \"#{yoolk_auth_error_url}\"
+        #           }", yoolk_auth_handshake_response_code)
+        # end
 
         def get_valid_token_from_core
           "{\"valid\": #{yoolk_auth_logged_in?}}"
