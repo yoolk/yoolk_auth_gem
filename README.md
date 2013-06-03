@@ -6,7 +6,7 @@ This gem assists with correctly loading and authenticating an application as an 
 
 Add this line to your application's Gemfile
 
-    gem 'yoolk_auth', '0.1.4', :git => 'git://github.com/yoolk/yoolk_auth_gem.git'
+    gem 'yoolk_auth', '0.1.5', :git => 'git://github.com/yoolk/yoolk_auth_gem.git'
 
 And then execute:
 
